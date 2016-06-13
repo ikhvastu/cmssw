@@ -52,12 +52,16 @@ void HcalSimpleRecAlgo::setRecoParams(bool correctForTimeslew, bool correctForPu
 void HcalSimpleRecAlgo::setpuCorrParams(bool   iPedestalConstraint, bool iTimeConstraint,bool iAddPulseJitter,
 					bool   iUnConstrainedFit,   bool iApplyTimeSlew,double iTS4Min, double iTS4Max,
 					double iPulseJitter,double iTimeMean,double iTimeSig,double iPedMean,double iPedSig,
+                    double iM0SF,double iM21PSF,double iM23PSF,
 					double iNoise,double iTMin,double iTMax,
 					double its3Chi2,double its4Chi2,double its345Chi2,double iChargeThreshold, int iFitTimes) { 
   if( iPedestalConstraint ) assert ( iPedSig );
   if( iTimeConstraint ) assert( iTimeSig );
   psFitOOTpuCorr_->setPUParams(iPedestalConstraint,iTimeConstraint,iAddPulseJitter,iUnConstrainedFit,iApplyTimeSlew,
-			       iTS4Min, iTS4Max, iPulseJitter,iTimeMean,iTimeSig,iPedMean,iPedSig,iNoise,iTMin,iTMax,its3Chi2,its4Chi2,its345Chi2,
+			       //iTS4Min, iTS4Max, iPulseJitter,iTimeMean,iTimeSig,iPedMean,iPedSig,iNoise,iTMin,iTMax,its3Chi2,its4Chi2,its345Chi2,
+                   iTS4Min, iTS4Max, iPulseJitter,iTimeMean,iTimeSig,iPedMean,iPedSig,
+                   iM0SF,iM21PSF,iM23PSF,
+                   iNoise,iTMin,iTMax,its3Chi2,its4Chi2,its345Chi2,
 			       iChargeThreshold,HcalTimeSlew::Medium, iFitTimes);
 //  int shapeNum = HPDShapev3MCNum;
 //  psFitOOTpuCorr_->setPulseShapeTemplate(theHcalPulseShapes_.getShape(shapeNum));
@@ -365,7 +369,12 @@ namespace HcalSimpleRecAlgoImpl {
       }
       psFitOOTpuCorr->apply(cs, capidvec, calibs, correctedOutput);
       if( correctedOutput.back() == 0 && correctedOutput.size() >1 ){
-	time = correctedOutput[1]; ampl = correctedOutput[0];
+	    //time = correctedOutput[1]; ampl = correctedOutput[0];
+      //}
+        time = correctedOutput[1]; 
+        ampl = correctedOutput[0];
+      } else { 
+        ampl = ampl* psFitOOTpuCorr->M0SF_;
       }
     }
     
